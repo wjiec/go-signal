@@ -73,3 +73,22 @@ func TestWhen(t *testing.T) {
 		}
 	}
 }
+
+func TestWith(t *testing.T) {
+	ctx, cancel := With(context.TODO(), SigUsr1)
+	defer cancel()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		<-ctx.Done()
+		wg.Done()
+	}()
+
+	if pid := os.Getpid(); assert.Greater(t, pid, 0) {
+		if err := SendSignalUser1(pid); assert.NoError(t, err) {
+			WaitAny(time.Second, wg.Wait, NoSignalArrived(t))
+		}
+	}
+}
