@@ -1,4 +1,4 @@
-name: Go
+name: go-signal
 
 on:
   push:
@@ -7,16 +7,54 @@ on:
     branches: [ main ]
 
 jobs:
-
-  check:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.13'
 
-    - name: Test
-      run: go test -v ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          args: --verbose
+
+  test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        go: [ 1.13, 1.14, 1.15, 1.16, 1.17 ]
+        include:
+          - os: ubuntu-latest
+            go-cache: ~/go/pkg/mod
+            go-build: ~/.cache/go-build
+          - os: macos-latest
+            go-cache: ~/go/pkg/mod
+            go-build: ~/Library/Caches/go-build
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Test
+        run: go test -v -covermode=atomic -coverprofile=coverage.out
+
+      - name: Cache builds
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ matrix.go-build }}
+            ${{ matrix.go-cache }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
