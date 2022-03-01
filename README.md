@@ -1,5 +1,5 @@
 # go-signal
-[![GoDoc](https://godoc.org/github.com/wjiec/go-signal?status.svg)](https://godoc.org/github.com/wjiec/go-signal)
+[![Go Reference](https://pkg.go.dev/badge/github.com/wjiec/go-signal.svg)](https://pkg.go.dev/github.com/wjiec/go-signal)
 [![Go Report Card](https://goreportcard.com/badge/github.com/wjiec/go-signal)](https://goreportcard.com/report/github.com/wjiec/go-signal)
 
 Package signal provides simple, semantic manipulation of the operating system's signal processing.
