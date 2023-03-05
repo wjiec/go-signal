@@ -18,19 +18,24 @@ Listens to the user's signal to exit the program and performs cleanup
 ```go
 func main() {
 	f, _ := os.Open("path/to/your/config")
+	s, _ := http.NewServer(f)
+
 	signal.Once(syscall.SIGTERM).Notify(context.TODO(), func(sig os.Signal) {
+		_ = s.Shutdown()
 		_ = f.Close()
 	})
+
+	s.Start()
 }
 ```
 
 Listening for `SIGUSR1` signals from users and performing services reload
 ```go
-var srv Reloadable
-
 func main() {
+	ngx, _ := nginx.New(cfg)
+
 	signal.When(syscall.SIGUSR1).Notify(context.TODO(), func(sig os.Signal) {
-		_ = srv.Reload()
+		_ = ngx.Reload()
 	})
 }
 ```
