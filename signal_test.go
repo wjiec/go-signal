@@ -53,11 +53,15 @@ func TestOnce(t *testing.T) {
 
 	t.Run("canceled", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
+		var wg sync.WaitGroup
+		wg.Add(1)
 		Once(SigUsr1).Notify(ctx, func(sig os.Signal) {
 			assert.Equal(t, SigCtx, sig)
+			wg.Done()
 		})
 
 		cancel()
+		wg.Wait()
 	})
 }
 

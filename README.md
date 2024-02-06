@@ -42,9 +42,9 @@ func main() {
 
 Create a context object using the specified signals and cancel the current context when the signal arrived
 ```go
-var db *sql.DB
-
 func main() {
+    var db *sql.DB
+
 	ctx, cancel := signal.With(context.TODO(), syscall.SIGTERM)
 	defer cancel()
 
